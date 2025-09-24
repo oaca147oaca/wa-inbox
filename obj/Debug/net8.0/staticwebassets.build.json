@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "ZxvqA0+QFkHyvlt8har5KwJ5eEvv9vZ6TzlEbrQKuNE=",
+  "Source": "WaInbox",
+  "BasePath": "_content/WaInbox",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "WaInbox/wwwroot",
+      "Source": "WaInbox",
+      "ContentRoot": "/Users/Octavio/WaInbox/wwwroot/",
+      "BasePath": "_content/WaInbox",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/Octavio/WaInbox/wwwroot/index.html",
+      "SourceId": "WaInbox",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Octavio/WaInbox/wwwroot/",
+      "BasePath": "_content/WaInbox",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/index.html"
+    }
+  ]
+}

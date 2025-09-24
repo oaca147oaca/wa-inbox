@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/Octavio/WaInbox/wwwroot/index.html",
+      "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.WaInbox.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.WaInbox.props",
+      "PackagePath": "build\\WaInbox.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.WaInbox.props",
+      "PackagePath": "buildMultiTargeting\\WaInbox.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.WaInbox.props",
+      "PackagePath": "buildTransitive\\WaInbox.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

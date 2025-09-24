@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>WhatsApp Inbox</title>
+  <style>
+    body { font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
+    #convs { width: 30%; border-right: 1px solid #ccc; overflow-y: auto; padding: 8px; }
+    #chat { flex: 1; display: flex; flex-direction: column; }
+    #msgs { flex: 1; overflow-y: auto; padding: 12px; background: #fafafa; }
+    .msg { margin: 4px 0; padding: 6px 10px; border-radius: 8px; max-width: 70%; cursor: pointer; }
+    .msg.in { background: #fff; border: 1px solid #eee; text-align: left; }
+    .msg.out { background: #dcf8c6; text-align: right; margin-left: auto; }
+    #reply { font-size: 0.9em; color: #666; margin: 4px 12px; min-height: 18px; }
+    #input { display: flex; border-top: 1px solid #ccc; padding: 8px; gap: 8px; }
+    #input input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+    #input button { padding: 8px 12px; background: #25D366; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+    .convItem { padding: 6px 4px; border-bottom: 1px solid #eee; }
+    .convItem:hover { background: #f7f7f7; }
+    .last { color: #666; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <div id="convs"></div>
+  <div id="chat">
+    <div id="msgs"></div>
+    <div id="reply"></div>
+    <div id="input">
+      <input id="text" placeholder="Escribir mensaje..." />
+      <button id="sendBtn">Enviar</button>
+    </div>
+  </div>
+
+<script>
+let currentWaId = null;
+let replyTo = null; // { id, body }
+
+async function loadConvs() {
+  const r = await fetch('/api/conversations');
+  const list = await r.json();
+  const div = document.getElementById('convs');
+  div.innerHTML = '';
+  list.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'convItem';
+    d.innerHTML = `<div><strong>${c.waId}</strong></div><div class="last">${c.lastBody || ''}</div>`;
+    d.onclick = () => openChat(c.waId);
+    div.appendChild(d);
+  });
+}
+
+async function openChat(waId) {
+  currentWaId = waId;
+  replyTo = null;
+  document.getElementById("reply").textContent = "";
+  const r = await fetch('/api/messages/' + waId);
+  const msgs = await r.json();
+  const box = document.getElementById('msgs');
+  box.innerHTML = '';
+  msgs.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'msg ' + (m.direction || m.Direction);
+    d.textContent = m.body || m.Body || '';
+    d.onclick = () => selectMsg(m.id || m.Id, m.body || m.Body || '');
+    box.appendChild(d);
+  });
+  box.scrollTop = box.scrollHeight;
+}
+
+function selectMsg(id, body) {
+  if (!id) return;
+  replyTo = { id, body };
+  document.getElementById("reply").textContent = "Respondiendo a: " + (body || "[mensaje]");
+}
+
+async function send() {
+  if (!currentWaId) return alert("Selecciona un chat primero");
+  const input = document.getElementById('text');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const payload = { to: currentWaId, text: text };
+  if (replyTo && replyTo.id) payload.replyTo = replyTo.id;
+
+  const r = await fetch('/api/send', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  if (!r.ok) {
+    const t = await r.text();
+    alert("Error al enviar: " + t);
+    return;
+  }
+
+  input.value = '';
+  replyTo = null;
+  document.getElementById("reply").textContent = "";
+  await openChat(currentWaId);
+}
+
+document.getElementById('sendBtn').onclick = send;
+document.getElementById('text').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+// Polling simple
+setInterval(()=>{ loadConvs(); if (currentWaId) openChat(currentWaId); }, 2000);
+
+// Primer load
+loadConvs();
+</script>
+</body>
+</html>
