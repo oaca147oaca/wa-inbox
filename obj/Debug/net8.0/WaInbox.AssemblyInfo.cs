@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaInbox")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ceb701c66862d09f1c9f081a18ccd6ed0cc239b9")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaInbox")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaInbox")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -43,10 +43,20 @@ app.MapGet("/webhook", (HttpRequest req) =>
 });
 
 // ---------- Webhook: Receive (POST) ----------
-app.MapPost("/webhook", (JsonElement body) =>
+app.MapPost("/webhook", async (HttpRequest req) =>
 {
+    string raw;
+    using (var reader = new StreamReader(req.Body, Encoding.UTF8))
+        raw = await reader.ReadToEndAsync();
+
+    Console.WriteLine("=== WEBHOOK RAW ===");
+    Console.WriteLine(raw);
+
     try
     {
+        using var doc = JsonDocument.Parse(raw);
+        var body = doc.RootElement;
+
         if (body.TryGetProperty("entry", out var entries) && entries.ValueKind == JsonValueKind.Array)
         {
             foreach (var entry in entries.EnumerateArray())
@@ -62,9 +72,9 @@ app.MapPost("/webhook", (JsonElement body) =>
 
                     foreach (var msg in messages.Value.EnumerateArray())
                     {
-                        var from = msg.GetPropertyOrNull("from")?.GetString();   // wa_id
+                        var from = msg.GetPropertyOrNull("from")?.GetString();
                         var type = msg.GetPropertyOrNull("type")?.GetString();
-                        var msgId = msg.GetPropertyOrNull("id")?.GetString();    // wamid
+                        var msgId = msg.GetPropertyOrNull("id")?.GetString();
                         string? text = null;
 
                         if (type == "text")
@@ -97,8 +107,10 @@ app.MapPost("/webhook", (JsonElement body) =>
         Console.WriteLine($"[WEBHOOK ERR] {ex}");
     }
 
+    // Siempre devolver 200 a Meta
     return Results.Ok();
 });
+
 
 // ---------- API: listar conversaciones (último mensaje por contacto) ----------
 app.MapGet("/api/conversations", () =>
@@ -131,6 +143,21 @@ app.MapPost("/api/send", async (SendRequest req) =>
         ["type"] = "text",
         ["text"] = new { body = req.Text }
     };
+
+    app.MapGet("/webhook", (HttpRequest req) =>
+    {
+        var mode = req.Query["hub.mode"].ToString();
+        var token = req.Query["hub.verify_token"].ToString();
+        var challenge = req.Query["hub.challenge"].ToString();
+
+        Console.WriteLine($"[VERIFY] mode={mode}, provided_len={token?.Length}, expected_len={cfg.VerifyToken?.Length}");
+
+        if (mode == "subscribe" && token == cfg.VerifyToken)
+            return Results.Text(challenge, "text/plain", Encoding.UTF8);
+
+        return Results.Unauthorized();
+    });
+
 
     // Si viene ReplyTo (wamid del mensaje citado), agregamos context
     if (!string.IsNullOrWhiteSpace(req.ReplyTo))
